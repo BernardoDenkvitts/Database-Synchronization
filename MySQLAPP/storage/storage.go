@@ -75,8 +75,7 @@ func (s *MySQLStore) Init() error {
 func (s *MySQLStore) CreateUserInformation(user *types.User) error {
 
 	userId := uuid.Must(uuid.NewRandom()).String()
-
-	query := "INSERT INTO user (id, firstName, lastName, created_at) VALUES($1, $2, $3, $4)"
+	query := "INSERT INTO user (id, firstName, lastName, created_at) VALUES(?, ?, ?, ?)"
 	_, err := s.db.Query(query, userId, user.FirstName, user.LastName, user.CreatedAt)
 	if err != nil {
 		return err

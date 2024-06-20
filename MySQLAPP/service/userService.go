@@ -19,3 +19,12 @@ func NewUserService(storage storage.Storage) *UserServiceImpl {
 		storage: storage,
 	}
 }
+
+func (userService *UserServiceImpl) CreateUser(userRequestDTO types.UserRequestDTO) (*types.User, error) {
+	newUser := types.NewUser(userRequestDTO)
+	err := userService.storage.CreateUserInformation(newUser)
+	if err != nil {
+		return nil, err
+	}
+	return newUser, nil
+}

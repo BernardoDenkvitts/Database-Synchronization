@@ -26,3 +26,14 @@ func NewUser(userRequestDTO UserRequestDTO) *User {
 		CreatedAt: time.Now().UTC(),
 	}
 }
+
+type UserResponseDTO struct {
+	Id        string `json: "id"`
+	FirstName string `json: "firstName`
+	LastName  string `json: "lastName"`
+	CreatedAt string `json: "createdAt"`
+}
+
+type NewUserResponseDTO struct {
+	Status int `json: status`
+}
