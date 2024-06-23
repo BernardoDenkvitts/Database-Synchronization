@@ -7,7 +7,8 @@ import (
 
 type UserService interface {
 	CreateUser(userRequestDTO types.UserRequestDTO) error
-	GetUsers() ([]*types.User, error)
+	GetUsers() ([]*types.UserResponseDTO, error)
+	GetUserById(id string) (*types.UserResponseDTO, error)
 }
 
 type UserServiceImpl struct {
@@ -26,5 +27,23 @@ func (userService *UserServiceImpl) CreateUser(userRequestDTO types.UserRequestD
 	if err != nil {
 		return nil, err
 	}
+
 	return newUser, nil
+}
+
+func (userService *UserServiceImpl) GetUserById(id string) (*types.UserResponseDTO, error) {
+	user, err := userService.storage.GetUserById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.Id == "" {
+		return nil, nil
+	}
+	return &types.UserResponseDTO{
+		Id:        user.Id,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		CreatedAt: user.CreatedAt,
+	}, nil
 }

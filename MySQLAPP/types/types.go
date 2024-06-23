@@ -6,6 +6,11 @@ import (
 	"github.com/google/uuid"
 )
 
+type ApiResponse struct {
+	Status  int `json: "status"`
+	Message any `json: "message"`
+}
+
 type User struct {
 	Id        string
 	FirstName string
@@ -28,12 +33,21 @@ func NewUser(userRequestDTO UserRequestDTO) *User {
 }
 
 type UserResponseDTO struct {
-	Id        string `json: "id"`
-	FirstName string `json: "firstName`
-	LastName  string `json: "lastName"`
-	CreatedAt string `json: "createdAt"`
+	Id        string    `json: "id"`
+	FirstName string    `json: "firstName`
+	LastName  string    `json: "lastName"`
+	CreatedAt time.Time `json: "createdAt"`
 }
 
-type NewUserResponseDTO struct {
-	Status int `json: status`
+func NewUserResponseDTO(user User) *UserResponseDTO {
+	return &UserResponseDTO{
+		Id:        user.Id,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		CreatedAt: user.CreatedAt,
+	}
 }
+
+// type NewUserResponseDTO struct {
+// 	Status int `json: status`
+// }

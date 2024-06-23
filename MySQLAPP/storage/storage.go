@@ -11,14 +11,15 @@ import (
 )
 
 const (
-	username = "root"
-	password = "root"
-	hostname = "127.0.0.1:3306"
-	dbname   = "mysqluser"
+	username  = "root"
+	password  = "root"
+	hostname  = "127.0.0.1:3306"
+	dbname    = "mysqluser"
+	parseTime = "true"
 )
 
 func dsn() string {
-	return fmt.Sprintf("%s:%s@tcp(%s)/%s", username, password, hostname, dbname)
+	return fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=%s", username, password, hostname, dbname, parseTime)
 }
 
 func scanIntoUser(rows *sql.Rows) (*types.User, error) {
@@ -37,6 +38,7 @@ func scanIntoUser(rows *sql.Rows) (*types.User, error) {
 type Storage interface {
 	Init() error
 	CreateUserInformation(*types.User) error
+	GetUserById(id string) (*types.User, error)
 	// This function will be use to get users created in the last 5 minutes
 	// to be sent to rabbitMQ
 	GetLatestUserInformations() ([]*types.User, error)
@@ -81,6 +83,23 @@ func (s *MySQLStore) CreateUserInformation(user *types.User) error {
 		return err
 	}
 	return nil
+}
+
+func (s *MySQLStore) GetUserById(id string) (*types.User, error) {
+	rows, err := s.db.Query("SELECT * FROM user WHERE id = ?", id)
+	if err != nil {
+		return nil, err
+	}
+
+	user := new(types.User)
+	for rows.Next() {
+		user, err = scanIntoUser(rows)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return user, nil
 }
 
 func (s *MySQLStore) GetLatestUserInformations() ([]*types.User, error) {

@@ -1,7 +1,6 @@
 package route
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/BernardoDenkvitts/MySQLApp/service"
@@ -20,31 +19,35 @@ func NewUserRoute(userService service.UserServiceImpl) *UserRoute {
 func (userRoute *UserRoute) Routes(router *http.ServeMux) {
 	router.Handle("/user/", http.StripPrefix("/user", router))
 	router.HandleFunc("POST /create", userRoute.handleCreateUser)
-	router.HandleFunc("GET /teste", userRoute.teste)
+	router.HandleFunc("GET /user/{id}", userRoute.handleGetUserInformationsById)
+	router.HandleFunc("GET /user", userR)
 }
 
-func (UserRoute *UserRoute) teste(w http.ResponseWriter, r *http.Request) {
-	utils.WriteJson(w, http.StatusCreated, "JESUS CRISTO", nil)
-}
-
-func (UserRoute *UserRoute) handleCreateUser(w http.ResponseWriter, r *http.Request) {
-	var payload types.UserRequestDTO
-	if err := utils.ParseJson(r, payload); err != nil {
-		err := utils.WriteJson(w, http.StatusBadRequest, err, nil)
-		if err != nil {
-			return
-		}
-	}
-	newUser, err := UserRoute.userService.CreateUser(payload)
-	if err != nil {
-		err := utils.WriteJson(w, http.StatusInternalServerError, err, nil)
-		if err != nil {
-			return
-		}
+func (userRoute *UserRoute) handleCreateUser(w http.ResponseWriter, r *http.Request) {
+	userRequestDTO := new(types.UserRequestDTO)
+	if err := utils.ParseJson(r, userRequestDTO); err != nil {
+		utils.WriteJson(w, http.StatusBadRequest, types.ApiResponse{Status: http.StatusBadRequest, Message: err.Error()}, nil)
 		return
 	}
-	fmt.Println(*newUser)
-	fmt.Println(newUser.Id)
-	var header = map[string]string{"location": "/user/get/" + newUser.Id}
-	utils.WriteJson(w, http.StatusCreated, types.NewUserResponseDTO{Status: http.StatusCreated}, &header)
+	newUser, err := userRoute.userService.CreateUser(*userRequestDTO)
+	if err != nil {
+		utils.WriteJson(w, http.StatusInternalServerError, types.ApiResponse{Status: http.StatusInternalServerError, Message: err.Error()}, nil)
+		return
+	}
+	header := map[string]string{"url": "/user/get/" + newUser.Id}
+	utils.WriteJson(w, http.StatusCreated, types.ApiResponse{Status: http.StatusCreated, Message: "Created"}, &header)
+}
+
+func (userRoute *UserRoute) handleGetUserInformationsById(w http.ResponseWriter, r *http.Request) {
+	userResponseDTO, err := userRoute.userService.GetUserById(r.PathValue("id"))
+	if err != nil {
+		utils.WriteJson(w, http.StatusNotFound, types.ApiResponse{Status: http.StatusInternalServerError, Message: err.Error()}, nil)
+		return
+	}
+	if userResponseDTO == nil {
+		utils.WriteJson(w, http.StatusNotFound, types.ApiResponse{Status: http.StatusNotFound, Message: "User Not Found"}, nil)
+		return
+	}
+
+	utils.WriteJson(w, http.StatusNotFound, types.ApiResponse{Status: http.StatusOK, Message: userResponseDTO}, nil)
 }
