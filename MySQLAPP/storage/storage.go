@@ -32,6 +32,7 @@ func scanIntoUser(rows *sql.Rows) (*types.User, error) {
 	); err != nil {
 		return nil, err
 	}
+
 	return user, nil
 }
 
@@ -42,6 +43,7 @@ type Storage interface {
 	// This function will be use to get users created in the last 5 minutes
 	// to be sent to rabbitMQ
 	GetLatestUserInformations() ([]*types.User, error)
+	GetUsersInformations() ([]*types.User, error)
 }
 
 type MySQLStore struct {
@@ -70,6 +72,7 @@ func (s *MySQLStore) Init() error {
 	if err != nil {
 		panic(err)
 	}
+
 	log.Println("Database Initialized")
 	return nil
 }
@@ -82,6 +85,7 @@ func (s *MySQLStore) CreateUserInformation(user *types.User) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -102,6 +106,24 @@ func (s *MySQLStore) GetUserById(id string) (*types.User, error) {
 	return user, nil
 }
 
+func (s *MySQLStore) GetUsersInformations() ([]*types.User, error) {
+	rows, err := s.db.Query("SELECT * FROM user")
+	if err != nil {
+		return nil, err
+	}
+
+	users := []*types.User{}
+	for rows.Next() {
+		user, err := scanIntoUser(rows)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+
+	return users, nil
+}
+
 func (s *MySQLStore) GetLatestUserInformations() ([]*types.User, error) {
 	rows, err := s.db.Query("SELECT * FROM user WHERE created_at >= UTC_TIMESTAMP() - INTERVAL 5 MINUTE")
 	if err != nil {
@@ -117,5 +139,6 @@ func (s *MySQLStore) GetLatestUserInformations() ([]*types.User, error) {
 		}
 		users = append(users, user)
 	}
+
 	return users, nil
 }

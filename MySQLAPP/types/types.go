@@ -7,8 +7,8 @@ import (
 )
 
 type ApiResponse struct {
-	Status  int `json: "status"`
-	Message any `json: "message"`
+	Status   int `json:"status"`
+	Response any `json:"response"`
 }
 
 type User struct {
@@ -19,8 +19,8 @@ type User struct {
 }
 
 type UserRequestDTO struct {
-	FirstName string `json: "firstName"`
-	LastName  string `json: "lastName"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
 }
 
 func NewUser(userRequestDTO UserRequestDTO) *User {
@@ -33,10 +33,10 @@ func NewUser(userRequestDTO UserRequestDTO) *User {
 }
 
 type UserResponseDTO struct {
-	Id        string    `json: "id"`
-	FirstName string    `json: "firstName`
-	LastName  string    `json: "lastName"`
-	CreatedAt time.Time `json: "createdAt"`
+	Id        string    `json:"id"`
+	FirstName string    `json:"firstName`
+	LastName  string    `json:"lastName"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 func NewUserResponseDTO(user User) *UserResponseDTO {
@@ -47,7 +47,3 @@ func NewUserResponseDTO(user User) *UserResponseDTO {
 		CreatedAt: user.CreatedAt,
 	}
 }
-
-// type NewUserResponseDTO struct {
-// 	Status int `json: status`
-// }

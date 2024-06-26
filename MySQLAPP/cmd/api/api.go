@@ -28,6 +28,7 @@ func (api *APIServer) Run() error {
 	storage.Init()
 
 	router.Handle("/mysql/", http.StripPrefix("/mysql", router))
+
 	userService := service.NewUserService(storage)
 	userRoute := route.NewUserRoute(*userService)
 	userRoute.Routes(router)
