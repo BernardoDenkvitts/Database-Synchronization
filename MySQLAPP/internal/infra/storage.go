@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/BernardoDenkvitts/MySQLApp/internal/types"
+	"github.com/BernardoDenkvitts/MySQLApp/internal/utils"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 )
@@ -69,11 +70,10 @@ func (s *MySQLStore) Init() error {
 		created_at timestamp
 	)`
 	_, err := s.db.Exec(query)
-	if err != nil {
-		panic(err)
-	}
+	utils.FailOnError(err, "Error to initiate Database")
 
 	log.Println("Database Initialized")
+
 	return nil
 }
 
@@ -125,7 +125,6 @@ func (s *MySQLStore) GetUsersInformations() ([]*types.User, error) {
 }
 
 func (s *MySQLStore) GetLatestUserInformations() ([]*types.User, error) {
-	// TODO verificar essa query
 	rows, err := s.db.Query("SELECT * FROM user WHERE created_at >= UTC_TIMESTAMP() - INTERVAL 5 MINUTE")
 	if err != nil {
 		return nil, err

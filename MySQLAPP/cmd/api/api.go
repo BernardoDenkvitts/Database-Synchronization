@@ -8,6 +8,7 @@ import (
 	"github.com/BernardoDenkvitts/MySQLApp/internal/route"
 	"github.com/BernardoDenkvitts/MySQLApp/internal/service"
 	"github.com/BernardoDenkvitts/MySQLApp/internal/service/rabbitmq"
+	"github.com/BernardoDenkvitts/MySQLApp/internal/utils"
 )
 
 type APIServer struct {
@@ -21,22 +22,17 @@ func NewAPIServer(address string) *APIServer {
 func (api *APIServer) Run() error {
 	router := http.NewServeMux()
 
-	storage, err := infra.NewMySQLStore()
-	if err != nil {
-		panic("Error to connect to database")
-	}
-
-	storage.Init()
+	storage := setupDatabase()
 
 	rabbitMq, err := infra.NewRabbitMQ()
-	if err != nil {
-		panic("Error to instanciate RabbitMQ")
-	}
+	utils.FailOnError(err, "Error to instanciate RabbitMQ")
 	defer rabbitMq.Close()
 
 	rabbitMqProducer := rabbitmq.NewRabbitMQProducer(storage, rabbitMq.Channel)
+	rabbitMqProducer.Produce()
 
-	go rabbitMqProducer.Produce()
+	rabbitMqConsumer := rabbitmq.NewRabbitMQConsumer(storage, rabbitMq.Channel)
+	rabbitMqConsumer.Consume()
 
 	router.Handle("/mysql/", http.StripPrefix("/mysql", router))
 
@@ -46,4 +42,12 @@ func (api *APIServer) Run() error {
 
 	fmt.Println("Server listening at port " + api.Address)
 	return http.ListenAndServe(api.Address, router)
+}
+
+func setupDatabase() infra.Storage {
+	storage, err := infra.NewMySQLStore()
+	utils.FailOnError(err, "Error to connect to database")
+	storage.Init()
+
+	return storage
 }

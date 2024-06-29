@@ -14,4 +14,5 @@ func main() {
 		fmt.Println(err.Error())
 		log.Fatal("Error to initialize server")
 	}
+
 }
