@@ -1,25 +1,25 @@
-package storage
+package infra
 
 import (
 	"database/sql"
 	"fmt"
 	"log"
 
-	"github.com/BernardoDenkvitts/MySQLApp/types"
+	"github.com/BernardoDenkvitts/MySQLApp/internal/types"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 )
 
 const (
-	username  = "root"
-	password  = "root"
-	hostname  = "127.0.0.1:3306"
-	dbname    = "mysqluser"
-	parseTime = "true"
+	username      = "root"
+	MySQLpassword = "root"
+	hostname      = "127.0.0.1:3306"
+	dbname        = "mysqluser"
+	parseTime     = "true"
 )
 
 func dsn() string {
-	return fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=%s", username, password, hostname, dbname, parseTime)
+	return fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=%s", username, MySQLpassword, hostname, dbname, parseTime)
 }
 
 func scanIntoUser(rows *sql.Rows) (*types.User, error) {
@@ -125,6 +125,7 @@ func (s *MySQLStore) GetUsersInformations() ([]*types.User, error) {
 }
 
 func (s *MySQLStore) GetLatestUserInformations() ([]*types.User, error) {
+	// TODO verificar essa query
 	rows, err := s.db.Query("SELECT * FROM user WHERE created_at >= UTC_TIMESTAMP() - INTERVAL 5 MINUTE")
 	if err != nil {
 		return nil, err

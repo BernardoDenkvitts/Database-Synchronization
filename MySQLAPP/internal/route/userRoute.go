@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/BernardoDenkvitts/MySQLApp/service"
-	"github.com/BernardoDenkvitts/MySQLApp/types"
-	"github.com/BernardoDenkvitts/MySQLApp/utils"
+	"github.com/BernardoDenkvitts/MySQLApp/internal/service"
+	"github.com/BernardoDenkvitts/MySQLApp/internal/types"
+	"github.com/BernardoDenkvitts/MySQLApp/internal/utils"
 )
 
 type UserRoute struct {

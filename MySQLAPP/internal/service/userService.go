@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/BernardoDenkvitts/MySQLApp/storage"
-	"github.com/BernardoDenkvitts/MySQLApp/types"
+	"github.com/BernardoDenkvitts/MySQLApp/internal/infra"
+	"github.com/BernardoDenkvitts/MySQLApp/internal/types"
 )
 
 type UserService interface {
@@ -13,10 +13,10 @@ type UserService interface {
 }
 
 type UserServiceImpl struct {
-	storage storage.Storage
+	storage infra.Storage
 }
 
-func NewUserService(storage storage.Storage) *UserServiceImpl {
+func NewUserService(storage infra.Storage) *UserServiceImpl {
 	return &UserServiceImpl{
 		storage: storage,
 	}

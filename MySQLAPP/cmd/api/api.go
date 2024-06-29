@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/BernardoDenkvitts/MySQLApp/route"
-	"github.com/BernardoDenkvitts/MySQLApp/service"
-	"github.com/BernardoDenkvitts/MySQLApp/storage"
+	"github.com/BernardoDenkvitts/MySQLApp/internal/infra"
+	"github.com/BernardoDenkvitts/MySQLApp/internal/route"
+	"github.com/BernardoDenkvitts/MySQLApp/internal/service"
+	"github.com/BernardoDenkvitts/MySQLApp/internal/service/rabbitmq"
 )
 
 type APIServer struct {
@@ -20,12 +21,22 @@ func NewAPIServer(address string) *APIServer {
 func (api *APIServer) Run() error {
 	router := http.NewServeMux()
 
-	storage, err := storage.NewMySQLStore()
+	storage, err := infra.NewMySQLStore()
 	if err != nil {
 		panic("Error to connect to database")
 	}
 
 	storage.Init()
+
+	rabbitMq, err := infra.NewRabbitMQ()
+	if err != nil {
+		panic("Error to instanciate RabbitMQ")
+	}
+	defer rabbitMq.Close()
+
+	rabbitMqProducer := rabbitmq.NewRabbitMQProducer(storage, rabbitMq.Channel)
+
+	go rabbitMqProducer.Produce()
 
 	router.Handle("/mysql/", http.StripPrefix("/mysql", router))
 
