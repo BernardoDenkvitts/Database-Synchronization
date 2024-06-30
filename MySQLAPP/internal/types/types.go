@@ -34,7 +34,7 @@ func NewUser(userRequestDTO UserRequestDTO) *User {
 
 type UserResponseDTO struct {
 	Id        string    `json:"id"`
-	FirstName string    `json:"firstName`
+	FirstName string    `json:"firstName"`
 	LastName  string    `json:"lastName"`
 	CreatedAt time.Time `json:"createdAt"`
 }
