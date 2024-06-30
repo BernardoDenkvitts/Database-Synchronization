@@ -22,7 +22,6 @@ func (userRoute *UserRoute) Routes(router *http.ServeMux) {
 	router.HandleFunc("POST /create", userRoute.handleCreateUser)
 	router.HandleFunc("GET /user/{id}", userRoute.handleGetUserInformationsById)
 	router.HandleFunc("GET /user", userRoute.handleGetUsersInformation)
-	router.HandleFunc("GET /userteste", userRoute.Teste)
 }
 
 func (userRoute *UserRoute) handleCreateUser(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +38,7 @@ func (userRoute *UserRoute) handleCreateUser(w http.ResponseWriter, r *http.Requ
 	}
 
 	w.Header().Add("Content-Type", "application-json")
-	w.Header().Add("uri", "/user/"+newUser.Id)
+	w.Header().Add("uri", "/mysql/user/"+newUser.Id)
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(types.ApiResponse{Status: http.StatusCreated, Response: "Created"})
 }
@@ -60,16 +59,6 @@ func (userRoute *UserRoute) handleGetUserInformationsById(w http.ResponseWriter,
 
 func (userRoute *UserRoute) handleGetUsersInformation(w http.ResponseWriter, r *http.Request) {
 	usersResponseDTO, err := userRoute.userService.GetUsers()
-	if err != nil {
-		utils.WriteJson(w, http.StatusInternalServerError, types.ApiResponse{Status: http.StatusInternalServerError, Response: err.Error()})
-		return
-	}
-
-	utils.WriteJson(w, http.StatusOK, types.ApiResponse{Status: http.StatusOK, Response: usersResponseDTO})
-}
-
-func (userRoute *UserRoute) Teste(w http.ResponseWriter, r *http.Request) {
-	usersResponseDTO, err := userRoute.userService.Teste()
 	if err != nil {
 		utils.WriteJson(w, http.StatusInternalServerError, types.ApiResponse{Status: http.StatusInternalServerError, Response: err.Error()})
 		return

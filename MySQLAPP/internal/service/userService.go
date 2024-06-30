@@ -9,7 +9,6 @@ type UserService interface {
 	CreateUser(userRequestDTO types.UserRequestDTO) error
 	GetUsers() ([]*types.UserResponseDTO, error)
 	GetUserById(id string) (*types.UserResponseDTO, error)
-	Teste() ([]*types.UserResponseDTO, error)
 }
 
 type UserServiceImpl struct {
@@ -62,18 +61,4 @@ func (userService *UserServiceImpl) GetUserById(id string) (*types.UserResponseD
 		LastName:  user.LastName,
 		CreatedAt: user.CreatedAt,
 	}, nil
-}
-
-func (userService *UserServiceImpl) Teste() ([]*types.UserResponseDTO, error) {
-	users, err := userService.storage.GetLatestUserInformations()
-	if err != nil {
-		return nil, err
-	}
-
-	usersResponseDTO := make([]*types.UserResponseDTO, len(users))
-	for idx, user := range users {
-		usersResponseDTO[idx] = types.NewUserResponseDTO(*user)
-	}
-
-	return usersResponseDTO, nil
 }

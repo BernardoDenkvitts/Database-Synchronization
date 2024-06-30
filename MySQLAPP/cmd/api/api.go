@@ -40,7 +40,7 @@ func (api *APIServer) Run() error {
 	userRoute := route.NewUserRoute(*userService)
 	userRoute.Routes(router)
 
-	fmt.Println("Server listening at port " + api.Address)
+	fmt.Println("MySQL APP Server listening at port " + api.Address)
 	return http.ListenAndServe(api.Address, router)
 }
 
