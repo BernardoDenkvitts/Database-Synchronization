@@ -39,7 +39,7 @@ func (userRoute *UserRoute) handleCreateUser(w http.ResponseWriter, r *http.Requ
 	}
 
 	w.Header().Add("Content-Type", "application-json")
-	w.Header().Add("uri", "/user/get/"+newUser.Id)
+	w.Header().Add("uri", "/user/"+newUser.Id)
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(types.ApiResponse{Status: http.StatusCreated, Response: "Created"})
 }
