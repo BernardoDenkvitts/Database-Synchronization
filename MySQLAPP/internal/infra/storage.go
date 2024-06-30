@@ -8,7 +8,6 @@ import (
 	"github.com/BernardoDenkvitts/MySQLApp/internal/types"
 	"github.com/BernardoDenkvitts/MySQLApp/internal/utils"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/google/uuid"
 )
 
 const (
@@ -18,24 +17,6 @@ const (
 	dbname        = "mysqluser"
 	parseTime     = "true"
 )
-
-func dsn() string {
-	return fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=%s", username, MySQLpassword, hostname, dbname, parseTime)
-}
-
-func scanIntoUser(rows *sql.Rows) (*types.User, error) {
-	user := new(types.User)
-	if err := rows.Scan(
-		&user.Id,
-		&user.FirstName,
-		&user.LastName,
-		&user.CreatedAt,
-	); err != nil {
-		return nil, err
-	}
-
-	return user, nil
-}
 
 type Storage interface {
 	Init() error
@@ -51,6 +32,10 @@ type MySQLStore struct {
 	db *sql.DB
 }
 
+func dsn() string {
+	return fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=%s", username, MySQLpassword, hostname, dbname, parseTime)
+}
+
 func NewMySQLStore() (*MySQLStore, error) {
 	db, err := sql.Open("mysql", dsn())
 	if err != nil {
@@ -60,6 +45,20 @@ func NewMySQLStore() (*MySQLStore, error) {
 	return &MySQLStore{
 		db: db,
 	}, nil
+}
+
+func scanIntoUser(rows *sql.Rows) (*types.User, error) {
+	user := new(types.User)
+	if err := rows.Scan(
+		&user.Id,
+		&user.FirstName,
+		&user.LastName,
+		&user.CreatedAt,
+	); err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (s *MySQLStore) Init() error {
@@ -79,9 +78,8 @@ func (s *MySQLStore) Init() error {
 
 func (s *MySQLStore) CreateUserInformation(user *types.User) error {
 
-	userId := uuid.Must(uuid.NewRandom()).String()
 	query := "INSERT INTO user (id, firstName, lastName, created_at) VALUES(?, ?, ?, ?)"
-	_, err := s.db.Query(query, userId, user.FirstName, user.LastName, user.CreatedAt)
+	_, err := s.db.Query(query, user.Id, user.FirstName, user.LastName, user.CreatedAt)
 	if err != nil {
 		return err
 	}
