@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/BernardoDenkvitts/MongoAPP/internal/infra"
 	"github.com/BernardoDenkvitts/MongoAPP/internal/route"
 	"github.com/BernardoDenkvitts/MongoAPP/internal/service"
 )
@@ -22,6 +23,13 @@ func (api *ApiServer) Run() error {
 	router := http.NewServeMux()
 
 	router.Handle("/mongodb/", http.StripPrefix("/mongodb", router))
+
+	storage, err := infra.NewMongoDBStore()
+	if err != nil {
+		return err
+	}
+
+	storage.InitMongoDB()
 
 	userService := service.NewUserService()
 	userRoute := route.NewUserRoute(userService)
