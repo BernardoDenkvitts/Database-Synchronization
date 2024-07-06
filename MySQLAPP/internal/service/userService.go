@@ -6,7 +6,8 @@ import (
 )
 
 type UserService interface {
-	CreateUser(userRequestDTO types.UserRequestDTO) error
+	// TODO change return to string -> ""
+	CreateUser(userRequestDTO types.UserRequestDTO) (string, error)
 	GetUsers() ([]*types.UserResponseDTO, error)
 	GetUserById(id string) (*types.UserResponseDTO, error)
 }
@@ -21,14 +22,14 @@ func NewUserService(storage infra.Storage) *UserServiceImpl {
 	}
 }
 
-func (userService *UserServiceImpl) CreateUser(userRequestDTO types.UserRequestDTO) (*types.User, error) {
+func (userService *UserServiceImpl) CreateUser(userRequestDTO types.UserRequestDTO) (string, error) {
 	newUser := types.NewUser(userRequestDTO)
 	err := userService.storage.CreateUserInformation(newUser)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return newUser, nil
+	return newUser.Id, nil
 }
 
 func (userService *UserServiceImpl) GetUsers() ([]*types.UserResponseDTO, error) {

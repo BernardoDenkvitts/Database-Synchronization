@@ -38,14 +38,14 @@ func (userRoute *UserRoute) handleCreateUser(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	newUser, err := userRoute.userService.CreateUser(*userRequestDTO)
+	newUserID, err := userRoute.userService.CreateUser(*userRequestDTO)
 	if err != nil {
 		utils.WriteJson(w, http.StatusInternalServerError, types.ApiResponse{Status: http.StatusInternalServerError, Response: err.Error()})
 		return
 	}
 
 	w.Header().Add("Content-Type", "application-json")
-	w.Header().Add("uri", "/mysql/user/"+newUser.Id)
+	w.Header().Add("uri", "/mysql/user/"+newUserID)
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(types.ApiResponse{Status: http.StatusCreated, Response: "Created"})
 }
