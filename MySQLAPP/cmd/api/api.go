@@ -25,7 +25,7 @@ func (api *APIServer) Run() error {
 	storage := setupDatabase()
 
 	rabbitMq, err := infra.NewRabbitMQ()
-	utils.FailOnError(err, "Error to instanciate RabbitMQ")
+	utils.FailOnError(err, "(MYSQL APP) Error to instanciate RabbitMQ")
 	defer rabbitMq.Close()
 
 	rabbitMqProducer := rabbitmq.NewRabbitMQProducer(storage, rabbitMq.Channel)
@@ -46,7 +46,7 @@ func (api *APIServer) Run() error {
 
 func setupDatabase() infra.Storage {
 	storage, err := infra.NewMySQLStore()
-	utils.FailOnError(err, "Error to connect to database")
+	utils.FailOnError(err, "(MYSQL APP) Error to connect to database")
 	storage.Init()
 
 	return storage

@@ -35,11 +35,11 @@ func (rmq *RabbitMQConsumer) Consume() {
 	go func() {
 		for newUsers := range msgs {
 
-			log.Println("Getting new users")
+			log.Println("(MYSQL APP) Getting new users")
 
 			var users []*types.User
 			if err := json.Unmarshal(newUsers.Body, &users); err != nil {
-				utils.FailOnError(err, "Fail to unmarshal new users")
+				utils.FailOnError(err, "(MYSQL APP) Failed to unmarshal new users")
 			}
 
 			for _, user := range users {
@@ -49,7 +49,7 @@ func (rmq *RabbitMQConsumer) Consume() {
 
 			newUsers.Ack(false)
 
-			log.Println("Latest users saved")
+			log.Println("(MYSQL APP) Latest users saved")
 
 		}
 	}()
@@ -66,7 +66,7 @@ func registerMySQLConsumer(channel *amqp.Channel) <-chan amqp.Delivery {
 		nil,
 	)
 	if err != nil {
-		utils.FailOnError(err, "Failed to register consumer")
+		utils.FailOnError(err, "(MYSQL APP) Failed to register consumer")
 	}
 
 	return msgs
