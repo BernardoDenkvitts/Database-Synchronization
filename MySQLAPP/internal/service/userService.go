@@ -6,7 +6,6 @@ import (
 )
 
 type UserService interface {
-	// TODO change return to string -> ""
 	CreateUser(userRequestDTO types.UserRequestDTO) (string, error)
 	GetUsers() ([]*types.UserResponseDTO, error)
 	GetUserById(id string) (*types.UserResponseDTO, error)
