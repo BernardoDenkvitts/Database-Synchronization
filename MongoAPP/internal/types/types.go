@@ -12,10 +12,10 @@ type ApiResponse struct {
 }
 
 type User struct {
-	Id        string
-	FirstName string
-	LastName  string
-	CreatedAt time.Time
+	Id        string    `bson:"id"`
+	FirstName string    `bson:"firstName"`
+	LastName  string    `bson:"lastName"`
+	CreatedAt time.Time `bson:"created_at"`
 }
 
 func NewUser(userRequestDTO UserRequestDTO) *User {
