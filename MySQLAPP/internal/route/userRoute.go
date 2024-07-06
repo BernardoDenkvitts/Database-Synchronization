@@ -9,6 +9,13 @@ import (
 	"github.com/BernardoDenkvitts/MySQLApp/internal/utils"
 )
 
+type UserRoutes interface {
+	Routes(router *http.ServeMux)
+	handleCreateUser(w http.ResponseWriter, r *http.Request)
+	handleGetUserInformationsById(w http.ResponseWriter, r *http.Request)
+	handleGetUsersInformation(w http.ResponseWriter, r *http.Request)
+}
+
 type UserRoute struct {
 	userService service.UserServiceImpl
 }
