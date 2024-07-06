@@ -64,7 +64,7 @@ func (s *MongoDBStore) GetUserById(id string) (*types.User, error) {
 
 func (s *MongoDBStore) GetUsersInformations() ([]*types.User, error) {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	cursor, err := s.getUserCollection().Find(ctx, bson.D{})
+	cursor, err := s.getUserCollection().Find(ctx, bson.M{})
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,25 @@ func (s *MongoDBStore) GetUsersInformations() ([]*types.User, error) {
 }
 
 func (s *MongoDBStore) GetLatestUserInformations() ([]*types.User, error) {
-	return nil, nil
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+
+	fiveMinutesAgo := time.Now().Add(-5 * time.Minute)
+
+	filter := bson.M{
+		"created_at": bson.M{"$gt": fiveMinutesAgo},
+	}
+
+	cursor, err := s.getUserCollection().Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	latestUsers, err := decodeUsersFromCursor(ctx, cursor)
+	if err != nil {
+		return nil, err
+	}
+
+	return latestUsers, nil
 }
 
 func decodeUsersFromCursor(ctx context.Context, cursor *mongo.Cursor) ([]*types.User, error) {
