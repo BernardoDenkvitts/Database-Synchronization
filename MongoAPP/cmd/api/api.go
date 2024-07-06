@@ -29,10 +29,10 @@ func (api *ApiServer) Run() error {
 		return err
 	}
 
-	storage.InitMongoDB()
+	storage.Init()
 
-	userService := service.NewUserService()
-	userRoute := route.NewUserRoute(userService)
+	userService := service.NewUserServiceImpl(storage)
+	userRoute := route.NewUserRouteImpl(userService)
 	userRoute.Routes(router)
 
 	fmt.Println("MongoDB APP Server listening at port " + api.Address)

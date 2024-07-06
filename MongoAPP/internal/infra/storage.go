@@ -3,9 +3,9 @@ package infra
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
+	"github.com/BernardoDenkvitts/MongoAPP/internal/types"
 	"github.com/BernardoDenkvitts/MongoAPP/internal/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -14,11 +14,22 @@ import (
 )
 
 const (
-	username = "root"
-	password = "root"
-	hostname = "localhost:27017"
-	dbName   = "mongodbuser"
+	username       = "root"
+	password       = "root"
+	hostname       = "localhost:27017"
+	dbName         = "mongodbuser"
+	collectionName = "user"
 )
+
+type Storage interface {
+	Init()
+	CreateUserInformation(*types.User) error
+	GetUserById(id string) (*types.User, error)
+	// This function will be use to get users created in the last 5 minutes
+	// to be sent to rabbitMQ
+	GetLatestUserInformations() ([]*types.User, error)
+	GetUsersInformations() ([]*types.User, error)
+}
 
 type MongoDBStore struct {
 	Client *mongo.Client
@@ -41,26 +52,6 @@ func NewMongoDBStore() (*MongoDBStore, error) {
 		Client: client,
 		Db:     client.Database(dbName),
 	}, nil
-}
-
-func (s *MongoDBStore) InitMongoDB() {
-
-	collections, err := s.Db.ListCollectionNames(context.TODO(), bson.M{"name": "user"})
-	utils.FailOnError(err, "Fail to get collections")
-
-	if len(collections) == 0 {
-		validator := bson.M{
-			"$jsonSchema": userSchema(),
-		}
-		opts := options.CreateCollection().SetValidator(validator)
-
-		err = s.Db.CreateCollection(context.TODO(), "user", opts)
-		utils.FailOnError(err, "Error to initiate database")
-
-		createIndex(s.Db)
-	}
-
-	log.Println("Database Initialized")
 }
 
 func userSchema() primitive.M {
@@ -89,7 +80,7 @@ func userSchema() primitive.M {
 }
 
 func createIndex(s *mongo.Database) {
-	collection := s.Collection("user")
+	collection := s.Collection(collectionName)
 	index := mongo.IndexModel{
 		Keys:    bson.D{{Key: "id", Value: 1}},
 		Options: options.Index().SetUnique(true),
