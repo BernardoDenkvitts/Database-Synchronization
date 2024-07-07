@@ -123,7 +123,7 @@ func (s *MySQLStore) GetUsersInformations() ([]*types.User, error) {
 }
 
 func (s *MySQLStore) GetLatestUserInformations() ([]*types.User, error) {
-	rows, err := s.db.Query("SELECT * FROM user WHERE created_at >= UTC_TIMESTAMP() - INTERVAL 5 MINUTE")
+	rows, err := s.db.Query("SELECT * FROM user WHERE created_at >= UTC_TIMESTAMP() - INTERVAL 1 MINUTE")
 	if err != nil {
 		return nil, err
 	}

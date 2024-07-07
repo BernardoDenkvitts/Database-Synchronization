@@ -3,18 +3,11 @@ package infra
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/BernardoDenkvitts/MongoAPP/internal/utils"
+	"github.com/joho/godotenv"
 	amqp "github.com/rabbitmq/amqp091-go"
-)
-
-const (
-	user         = "guest"
-	RBMQpassword = "guest"
-	host         = "localhost"
-	port         = "5672"
-	exchangeName = "MONGODB-APP"
-	queueName    = "MONGODB-APP-QUEUE"
 )
 
 type RabbitMQ struct {
@@ -23,7 +16,11 @@ type RabbitMQ struct {
 }
 
 func NewRabbitMQ() (*RabbitMQ, error) {
-	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s", user, RBMQpassword, host, port))
+	path, _ := os.Getwd()
+	err := godotenv.Load(path + "/../.env")
+	utils.FailOnError(err, "Failed to load env file")
+
+	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s", os.Getenv("user"), os.Getenv("RBMQpassword"), os.Getenv("host"), os.Getenv("port")))
 	utils.FailOnError(err, "Error to connect to rabbitmq")
 
 	channel, err := conn.Channel()
@@ -32,14 +29,11 @@ func NewRabbitMQ() (*RabbitMQ, error) {
 	err = channel.Confirm(false)
 	utils.FailOnError(err, "Failed to put channel in confirmation mode")
 
-	declareRabbitMQExchange(channel)
-	log.Printf("%s exchange declared", exchangeName)
-
 	declareQueue(channel)
-	log.Printf("%s Queue declared", queueName)
+	log.Printf("%s Queue declared", os.Getenv("MongoDBQueueName"))
 
-	bindQueue(channel, "MYSQL-APP")
-	log.Println("Queue binded to MYSQL-APP Exchange")
+	bindQueue(channel, os.Getenv("MySQLExchange"))
+	log.Printf("Queue binded to %s Exchange", os.Getenv("MySQLExchange"))
 
 	return &RabbitMQ{
 		Connection: conn,
@@ -52,23 +46,9 @@ func (r *RabbitMQ) Close() {
 	r.Channel.Close()
 }
 
-func declareRabbitMQExchange(channel *amqp.Channel) {
-	err := channel.ExchangeDeclare(
-		exchangeName,
-		"fanout",
-		true,
-		false,
-		false,
-		false,
-		nil,
-	)
-
-	utils.FailOnError(err, "Failed to declare exchange")
-}
-
 func declareQueue(channel *amqp.Channel) {
 	_, err := channel.QueueDeclare(
-		queueName,
+		os.Getenv("MongoDBQueueName"),
 		true,
 		false,
 		false,
@@ -81,12 +61,12 @@ func declareQueue(channel *amqp.Channel) {
 
 func bindQueue(channel *amqp.Channel, exchange string) {
 	err := channel.QueueBind(
-		queueName,
+		os.Getenv("MongoDBQueueName"),
 		"",
 		exchange,
 		false,
 		nil,
 	)
 
-	utils.FailOnError(err, "Failed to bind queue")
+	utils.FailOnError(err, "Failed to bind queue "+os.Getenv("MongoDBQueueName"))
 }

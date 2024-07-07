@@ -3,6 +3,7 @@ package rabbitmq
 import (
 	"encoding/json"
 	"log"
+	"time"
 
 	"github.com/BernardoDenkvitts/MySQLApp/internal/infra"
 	"github.com/BernardoDenkvitts/MySQLApp/internal/types"
@@ -33,6 +34,8 @@ func (rmq *RabbitMQConsumer) Consume() {
 	msgs := registerMySQLConsumer(rmq.amqpChannel)
 
 	for newUsers := range msgs {
+
+		time.Sleep(1 * time.Minute)
 
 		log.Println("(MYSQL APP) Getting new users")
 

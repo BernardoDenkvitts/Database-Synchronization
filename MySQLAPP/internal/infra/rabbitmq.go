@@ -3,8 +3,10 @@ package infra
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/BernardoDenkvitts/MySQLApp/internal/utils"
+	"github.com/joho/godotenv"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -23,23 +25,24 @@ type RabbitMQ struct {
 }
 
 func NewRabbitMQ() (*RabbitMQ, error) {
+	path, _ := os.Getwd()
+	err := godotenv.Load(path + "/../.env")
+	utils.FailOnError(err, "Failed to load env file")
 
-	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s", user, RBMQpassword, host, port))
+	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s", os.Getenv("user"), os.Getenv("RBMQpassword"), os.Getenv("host"), os.Getenv("port")))
 	utils.FailOnError(err, "Error to connect to rabbitmq")
 
 	channel, err := conn.Channel()
 	utils.FailOnError(err, "Failed to open channel")
+
 	err = channel.Confirm(false)
 	utils.FailOnError(err, "Failed to put channel in confirmation mode")
 
-	declareRabbitMQExchange(channel)
-	log.Printf("%s exchange declared", exchangeName)
-
 	declareQueue(channel)
-	log.Printf("%s Queue declared", queueName)
+	log.Printf("%s Queue declared", os.Getenv("MySQLQueueName"))
 
-	bindQueue(channel, "MONGODB-APP")
-	log.Println("Queue binded to MONGODB-APP Exchange")
+	bindQueue(channel, os.Getenv("MongoDBExchange"))
+	log.Printf("Queue binded to %s Exchange", os.Getenv("MongoDBExchange"))
 
 	return &RabbitMQ{
 		Connection: conn,
@@ -52,23 +55,9 @@ func (r *RabbitMQ) Close() {
 	r.Channel.Close()
 }
 
-func declareRabbitMQExchange(channel *amqp.Channel) {
-	err := channel.ExchangeDeclare(
-		exchangeName,
-		"fanout",
-		true,
-		false,
-		false,
-		false,
-		nil,
-	)
-	utils.FailOnError(err, "Failed to declare exchange")
-
-}
-
 func declareQueue(channel *amqp.Channel) {
 	_, err := channel.QueueDeclare(
-		queueName,
+		os.Getenv("MySQLQueueName"),
 		true,
 		false,
 		false,
@@ -80,11 +69,11 @@ func declareQueue(channel *amqp.Channel) {
 
 func bindQueue(channel *amqp.Channel, exchange string) {
 	err := channel.QueueBind(
-		queueName,
+		os.Getenv("MySQLQueueName"),
 		"",
 		exchange,
 		false,
 		nil,
 	)
-	utils.FailOnError(err, "Failed to bind queue")
+	utils.FailOnError(err, "Failed to bind queue "+os.Getenv("MySQLQueueName"))
 }

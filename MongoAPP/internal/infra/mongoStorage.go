@@ -81,7 +81,7 @@ func (s *MongoDBStore) GetUsersInformations() ([]*types.User, error) {
 func (s *MongoDBStore) GetLatestUserInformations() ([]*types.User, error) {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	fiveMinutesAgo := time.Now().Add(-5 * time.Minute)
+	fiveMinutesAgo := time.Now().Add(-1 * time.Minute)
 
 	filter := bson.M{
 		"created_at": bson.M{"$gt": fiveMinutesAgo},

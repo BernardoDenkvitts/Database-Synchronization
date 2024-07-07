@@ -3,6 +3,7 @@ package rabbitmq
 import (
 	"encoding/json"
 	"log"
+	"time"
 
 	"github.com/BernardoDenkvitts/MongoAPP/internal/infra"
 	"github.com/BernardoDenkvitts/MongoAPP/internal/types"
@@ -32,6 +33,8 @@ func (rmq *RabbitMQConsumer) Consume() {
 	msgs := registerMongoDBConsumer(rmq.amqpChannel)
 
 	for newUsers := range msgs {
+
+		time.Sleep(1 * time.Minute)
 
 		log.Println("(MONGO APP) Getting new users")
 

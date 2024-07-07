@@ -32,7 +32,7 @@ func NewRabbitMQProducer(userStorage infra.Storage, amqpChannel *amqp.Channel) *
 func (rmq *RabbitMQProducer) Produce() {
 
 	for {
-		time.Sleep(5 * time.Minute)
+		time.Sleep(1 * time.Minute)
 
 		latestUsers, _ := rmq.userStorage.GetLatestUserInformations()
 
