@@ -29,10 +29,10 @@ func (api *APIServer) Run() error {
 	defer rabbitMq.Close()
 
 	rabbitMqProducer := rabbitmq.NewRabbitMQProducer(storage, rabbitMq.Channel)
-	rabbitMqProducer.Produce()
+	go rabbitMqProducer.Produce()
 
 	rabbitMqConsumer := rabbitmq.NewRabbitMQConsumer(storage, rabbitMq.Channel)
-	rabbitMqConsumer.Consume()
+	go rabbitMqConsumer.Consume()
 
 	router.Handle("/mysql/", http.StripPrefix("/mysql", router))
 

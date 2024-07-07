@@ -11,7 +11,7 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-const exchangeName = "MONGODB"
+const exchangeName = "MONGODB-APP"
 
 type IProducer interface {
 	Produce()
@@ -31,52 +31,48 @@ func NewRabbitMQProducer(userStorage infra.Storage, amqpChannel *amqp.Channel) *
 
 func (rmq *RabbitMQProducer) Produce() {
 
-	go func() {
+	for {
+		time.Sleep(5 * time.Minute)
 
-		for {
-			time.Sleep(5 * time.Minute)
+		latestUsers, _ := rmq.userStorage.GetLatestUserInformations()
 
-			latestUsers, _ := rmq.userStorage.GetLatestUserInformations()
+		if len(latestUsers) == 0 {
+			log.Println("(MONGODB APP) No latest user informations available at " + time.Now().Format(time.RFC3339))
+			continue
+		}
 
-			if len(latestUsers) == 0 {
-				log.Println("(MONGODB APP) No latest user informations available at " + time.Now().Format(time.RFC3339))
+		for _, user := range latestUsers {
+			log.Println(*user)
+		}
+
+		latestUsersJSON, err := json.Marshal(latestUsers)
+		utils.FailOnError(err, "(MONGODB APP) Failed to marshal the data")
+
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		retrys := 0
+		for retrys < 3 {
+			publishConfirmation, err := rmq.publishUsers(ctx, latestUsersJSON)
+			if err != nil {
+				log.Println("(MONGODB APP) Failed to publish the data -> " + err.Error())
+				retrys += 1
 				continue
 			}
 
-			for _, user := range latestUsers {
-				log.Println(*user)
+			if _, err := publishConfirmation.WaitContext(ctx); err != nil {
+				log.Println("(MONGODB APP) Failed to receive publish confirmation -> " + err.Error())
+				retrys += 1
+				continue
 			}
-
-			latestUsersJSON, err := json.Marshal(latestUsers)
-			utils.FailOnError(err, "(MONGODB APP) Failed to marshal the data")
-
-			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-			defer cancel()
-
-			retrys := 0
-			for retrys < 3 {
-				publishConfirmation, err := rmq.publishUsers(ctx, latestUsersJSON)
-				if err != nil {
-					log.Println("(MONGODB APP) Failed to publish the data -> " + err.Error())
-					retrys += 1
-					continue
-				}
-
-				if _, err := publishConfirmation.WaitContext(ctx); err != nil {
-					log.Println("(MONGODB APP) Failed to receive publish confirmation -> " + err.Error())
-					retrys += 1
-					continue
-				}
-				break
-			}
-			if retrys == 3 {
-				panic("(MONGODB APP) Error to publish the data")
-			}
-
-			log.Println("(MONGODB APP) Latest users sent to exchange !!")
+			break
+		}
+		if retrys == 3 {
+			panic("(MONGODB APP) Error to publish the data")
 		}
 
-	}()
+		log.Println("(MONGODB APP) Latest users sent to exchange !!")
+	}
 
 }
 

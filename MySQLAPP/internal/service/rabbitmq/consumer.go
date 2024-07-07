@@ -10,7 +10,7 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-const queueName = "MYSQL"
+const queueName = "MYSQL-APP-QUEUE"
 
 type IConsumer interface {
 	Consume()
@@ -32,27 +32,25 @@ func (rmq *RabbitMQConsumer) Consume() {
 
 	msgs := registerMySQLConsumer(rmq.amqpChannel)
 
-	go func() {
-		for newUsers := range msgs {
+	for newUsers := range msgs {
 
-			log.Println("(MYSQL APP) Getting new users")
+		log.Println("(MYSQL APP) Getting new users")
 
-			var users []*types.User
-			if err := json.Unmarshal(newUsers.Body, &users); err != nil {
-				utils.FailOnError(err, "(MYSQL APP) Failed to unmarshal new users")
-			}
-
-			for _, user := range users {
-				rmq.userStorage.CreateUserInformation(user)
-				log.Printf("New user saved -> %s", *user)
-			}
-
-			newUsers.Ack(false)
-
-			log.Println("(MYSQL APP) Latest users saved")
-
+		var users []*types.User
+		if err := json.Unmarshal(newUsers.Body, &users); err != nil {
+			utils.FailOnError(err, "(MYSQL APP) Failed to unmarshal new users")
 		}
-	}()
+
+		for _, user := range users {
+			rmq.userStorage.CreateUserInformation(user)
+			log.Printf("New user saved -> %s", *user)
+		}
+
+		newUsers.Ack(false)
+
+		log.Println("(MYSQL APP) Latest users saved")
+
+	}
 }
 
 func registerMySQLConsumer(channel *amqp.Channel) <-chan amqp.Delivery {

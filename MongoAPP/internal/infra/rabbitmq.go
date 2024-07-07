@@ -13,8 +13,8 @@ const (
 	RBMQpassword = "guest"
 	host         = "localhost"
 	port         = "5672"
-	exchangeName = "MONGODB"
-	queueName    = "MONGODB"
+	exchangeName = "MONGODB-APP"
+	queueName    = "MONGODB-APP-QUEUE"
 )
 
 type RabbitMQ struct {
@@ -33,12 +33,13 @@ func NewRabbitMQ() (*RabbitMQ, error) {
 	utils.FailOnError(err, "Failed to put channel in confirmation mode")
 
 	declareRabbitMQExchange(channel)
-	log.Println("RabbitMQ exchange declared")
+	log.Printf("%s exchange declared", exchangeName)
 
 	declareQueue(channel)
-	log.Println("Queue declared")
+	log.Printf("%s Queue declared", queueName)
 
-	bindQueue(channel)
+	bindQueue(channel, "MYSQL-APP")
+	log.Println("Queue binded to MYSQL-APP Exchange")
 
 	return &RabbitMQ{
 		Connection: conn,
@@ -78,11 +79,11 @@ func declareQueue(channel *amqp.Channel) {
 	utils.FailOnError(err, "Failed to declare queue")
 }
 
-func bindQueue(channel *amqp.Channel) {
+func bindQueue(channel *amqp.Channel, exchange string) {
 	err := channel.QueueBind(
 		queueName,
 		"",
-		exchangeName,
+		exchange,
 		false,
 		nil,
 	)
