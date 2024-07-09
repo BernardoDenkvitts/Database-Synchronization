@@ -16,29 +16,29 @@ type UserRoutes interface {
 	handleGetUsersInformation(w http.ResponseWriter, r *http.Request)
 }
 
-type UserRoute struct {
-	userService service.UserServiceImpl
+type UserRoutesImpl struct {
+	userService service.UserService
 }
 
-func NewUserRoute(userService service.UserServiceImpl) *UserRoute {
-	return &UserRoute{userService: userService}
+func NewUserRouteImpl(userService service.UserService) *UserRoutesImpl {
+	return &UserRoutesImpl{userService: userService}
 }
 
-func (userRoute *UserRoute) Routes(router *http.ServeMux) {
+func (route *UserRoutesImpl) Routes(router *http.ServeMux) {
 	router.Handle("/user/", http.StripPrefix("/user", router))
-	router.HandleFunc("POST /create", userRoute.handleCreateUser)
-	router.HandleFunc("GET /user/{id}", userRoute.handleGetUserInformationsById)
-	router.HandleFunc("GET /user", userRoute.handleGetUsersInformation)
+	router.HandleFunc("POST /create", route.handleCreateUser)
+	router.HandleFunc("GET /user/{id}", route.handleGetUserInformationsById)
+	router.HandleFunc("GET /user", route.handleGetUsersInformation)
 }
 
-func (userRoute *UserRoute) handleCreateUser(w http.ResponseWriter, r *http.Request) {
+func (route *UserRoutesImpl) handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	userRequestDTO := new(types.UserRequestDTO)
 	if err := utils.ParseJson(r, userRequestDTO); err != nil {
 		utils.WriteJson(w, http.StatusBadRequest, types.ApiResponse{Status: http.StatusBadRequest, Response: err.Error()})
 		return
 	}
 
-	newUserID, err := userRoute.userService.CreateUser(*userRequestDTO)
+	newUserID, err := route.userService.CreateUser(*userRequestDTO)
 	if err != nil {
 		utils.WriteJson(w, http.StatusInternalServerError, types.ApiResponse{Status: http.StatusInternalServerError, Response: err.Error()})
 		return
@@ -50,8 +50,8 @@ func (userRoute *UserRoute) handleCreateUser(w http.ResponseWriter, r *http.Requ
 	json.NewEncoder(w).Encode(types.ApiResponse{Status: http.StatusCreated, Response: "Created"})
 }
 
-func (userRoute *UserRoute) handleGetUserInformationsById(w http.ResponseWriter, r *http.Request) {
-	userResponseDTO, err := userRoute.userService.GetUserById(r.PathValue("id"))
+func (route *UserRoutesImpl) handleGetUserInformationsById(w http.ResponseWriter, r *http.Request) {
+	userResponseDTO, err := route.userService.GetUserById(r.PathValue("id"))
 	if err != nil {
 		utils.WriteJson(w, http.StatusInternalServerError, types.ApiResponse{Status: http.StatusInternalServerError, Response: err.Error()})
 		return
@@ -64,8 +64,8 @@ func (userRoute *UserRoute) handleGetUserInformationsById(w http.ResponseWriter,
 	utils.WriteJson(w, http.StatusOK, types.ApiResponse{Status: http.StatusOK, Response: userResponseDTO})
 }
 
-func (userRoute *UserRoute) handleGetUsersInformation(w http.ResponseWriter, r *http.Request) {
-	usersResponseDTO, err := userRoute.userService.GetUsers()
+func (route *UserRoutesImpl) handleGetUsersInformation(w http.ResponseWriter, r *http.Request) {
+	usersResponseDTO, err := route.userService.GetUsers()
 	if err != nil {
 		utils.WriteJson(w, http.StatusInternalServerError, types.ApiResponse{Status: http.StatusInternalServerError, Response: err.Error()})
 		return

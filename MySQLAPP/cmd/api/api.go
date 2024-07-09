@@ -37,7 +37,7 @@ func (api *APIServer) Run() error {
 	router.Handle("/mysql/", http.StripPrefix("/mysql", router))
 
 	userService := service.NewUserService(storage)
-	userRoute := route.NewUserRoute(*userService)
+	userRoute := route.NewUserRouteImpl(userService)
 	userRoute.Routes(router)
 
 	fmt.Println("MySQL APP Server listening at port " + api.Address)

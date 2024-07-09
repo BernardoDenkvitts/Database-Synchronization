@@ -39,7 +39,7 @@ func (api *ApiServer) Run() error {
 	router.Handle("/mongodb/", http.StripPrefix("/mongodb", router))
 
 	userService := service.NewUserServiceImpl(storage)
-	userRoute := route.NewUserRouteImpl(userService)
+	userRoute := route.NewUserRoutesImpl(userService)
 	userRoute.Routes(router)
 
 	fmt.Println("MongoDB APP Server listening at port " + api.Address)
