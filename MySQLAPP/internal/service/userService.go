@@ -55,10 +55,5 @@ func (userService *UserServiceImpl) GetUserById(id string) (*types.UserResponseD
 		return nil, nil
 	}
 
-	return &types.UserResponseDTO{
-		Id:        user.Id,
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
-		CreatedAt: user.CreatedAt,
-	}, nil
+	return types.NewUserResponseDTO(*user), nil
 }
