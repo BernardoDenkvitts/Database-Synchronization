@@ -12,17 +12,5 @@ services:
     networks:
       - postgres-network
 
-  pgadmin:
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: "root@gmail.com"
-      PGADMIN_DEFAULT_PASSWORD: "root"
-    ports:
-      - "16543:80"
-    depends_on:
-      - postgres
-    networks:
-      - postgres-network
-
 networks: 
   postgres-network:

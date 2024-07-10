@@ -1,16 +1,11 @@
 package main
 
-import (
-	"fmt"
-
-	"github.com/BernardoDenkvitts/PostgresAPP/internal/infra"
-)
+import "github.com/BernardoDenkvitts/PostgresAPP/cmd/api"
 
 func main() {
-	_, err := infra.NewPostgresStore()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("funcionando")
 
+	api := api.NewAPIServer(":8282")
+	if err := api.Run(); err != nil {
+		panic("Error to initialize server")
+	}
 }

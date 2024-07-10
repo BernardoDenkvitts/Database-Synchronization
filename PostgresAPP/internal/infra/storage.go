@@ -2,6 +2,7 @@ package infra
 
 import (
 	"database/sql"
+	"log"
 
 	"github.com/BernardoDenkvitts/PostgresAPP/internal/types"
 	"github.com/BernardoDenkvitts/PostgresAPP/internal/utils"
@@ -36,21 +37,22 @@ func NewPostgresStore() (*PostgresStore, error) {
 }
 
 func (s *PostgresStore) Init() error {
-	query := `CREATE TABLE IF NOT EXISTS user (
-		id varchar(50) PRIMARY KEY,
+	query := `CREATE TABLE IF NOT EXISTS userinfo (
+		id VARCHAR(50) PRIMARY KEY,
 		firstName VARCHAR(50), 
 		lastName VARCHAR(50),
 		created_at TIMESTAMP
-	)`
+	);`
 
 	_, err := s.db.Exec(query)
 	utils.FailOnError(err, "Failed to create table")
+	log.Println("Table created")
 
 	return nil
 }
 
 func (s *PostgresStore) CreateUserInformation(user *types.User) error {
-	query := "INSERT INTO user (id, firstName, lastName, created_at) VALUES ($1, $2, $3, $4)"
+	query := "INSERT INTO userinfo (id, firstName, lastName, created_at) VALUES ($1, $2, $3, $4)"
 	_, err := s.db.Query(query, user.Id, user.FirstName, user.LastName, user.CreatedAt)
 	if err != nil {
 		return err
@@ -60,7 +62,7 @@ func (s *PostgresStore) CreateUserInformation(user *types.User) error {
 }
 
 func (s *PostgresStore) GetUserById(id string) (*types.User, error) {
-	query := "SELECT * FROM user WHERE id = $1"
+	query := "SELECT * FROM userinfo WHERE userinfo.id = $1;"
 	row, err := s.db.Query(query, id)
 	if err != nil {
 		return nil, err
@@ -78,13 +80,13 @@ func (s *PostgresStore) GetUserById(id string) (*types.User, error) {
 }
 
 func (s *PostgresStore) GetLatestUserInformations() ([]*types.User, error) {
-	query := "SELECT * FROM user WHERE created_at >= current_timestamp - INTERVAL '1 minute'"
+	query := "SELECT * FROM userinfo WHERE userinfo.created_at >= current_timestamp - INTERVAL '1 minute'"
 	rows, err := s.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
 
-	var latestUsers []*types.User
+	latestUsers := []*types.User{}
 	for rows.Next() {
 		user, err := scanIntoUser(rows)
 		if err != nil {
@@ -97,7 +99,7 @@ func (s *PostgresStore) GetLatestUserInformations() ([]*types.User, error) {
 }
 
 func (s *PostgresStore) GetUsersInformations() ([]*types.User, error) {
-	query := "SELECT * FROM user"
+	query := "SELECT * FROM userinfo"
 	rows, err := s.db.Query(query)
 	if err != nil {
 		return nil, err
