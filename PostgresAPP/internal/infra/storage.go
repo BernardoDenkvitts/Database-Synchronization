@@ -105,7 +105,7 @@ func (s *PostgresStore) GetUsersInformations() ([]*types.User, error) {
 		return nil, err
 	}
 
-	var users []*types.User
+	users := []*types.User{}
 	for rows.Next() {
 		user, err := scanIntoUser(rows)
 		if err != nil {
