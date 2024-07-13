@@ -4,14 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"os"
 	"time"
 
 	"github.com/BernardoDenkvitts/MongoAPP/internal/infra"
 	"github.com/BernardoDenkvitts/MongoAPP/internal/utils"
+	"github.com/joho/godotenv"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
-
-const exchangeName = "MONGODB-APP"
 
 type IProducer interface {
 	Produce()
@@ -32,17 +32,18 @@ func NewRabbitMQProducer(userStorage infra.Storage, amqpChannel *amqp.Channel) *
 func (rmq *RabbitMQProducer) Produce() {
 
 	for {
-		time.Sleep(1 * time.Minute)
+		time.Sleep(30 * time.Second)
 
 		latestUsers, _ := rmq.userStorage.GetLatestUserInformations()
 
 		if len(latestUsers) == 0 {
-			log.Println("(MONGODB APP) No latest user informations available at " + time.Now().Format(time.RFC3339))
+			log.Println("(MONGODB APP) No latest user informations available at " + time.Now().UTC().String())
 			continue
 		}
 
+		log.Println("Users to be sent to exchange: ")
 		for _, user := range latestUsers {
-			log.Println(*user)
+			log.Println(user)
 		}
 
 		latestUsersJSON, err := json.Marshal(latestUsers)
@@ -77,9 +78,13 @@ func (rmq *RabbitMQProducer) Produce() {
 }
 
 func (rmq *RabbitMQProducer) publishUsers(ctx context.Context, latestUsers []byte) (*amqp.DeferredConfirmation, error) {
+	path, _ := os.Getwd()
+	err := godotenv.Load(path + "/../.env")
+	utils.FailOnError(err, "Failed to load env file")
+
 	return rmq.amqpChannel.PublishWithDeferredConfirmWithContext(
 		ctx,
-		exchangeName,
+		os.Getenv("MongoDBExchange"),
 		"fanout",
 		false,
 		false,

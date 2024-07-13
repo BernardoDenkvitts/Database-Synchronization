@@ -35,6 +35,7 @@ func (rmq *RabbitMQConsumer) Consume() {
 
 	for newUsers := range msgs {
 
+		//Necessary to avoid send data that came from other application !!
 		time.Sleep(30 * time.Second)
 
 		log.Println("(POSTGRESSQL APP) Getting new users")

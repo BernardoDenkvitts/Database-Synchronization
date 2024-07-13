@@ -15,7 +15,7 @@ type UserServiceImpl struct {
 	storage infra.Storage
 }
 
-func NewUserService(storage infra.Storage) *UserServiceImpl {
+func NewUserServiceImpl(storage infra.Storage) *UserServiceImpl {
 	return &UserServiceImpl{
 		storage: storage,
 	}

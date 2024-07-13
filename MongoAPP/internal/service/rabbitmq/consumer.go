@@ -3,15 +3,15 @@ package rabbitmq
 import (
 	"encoding/json"
 	"log"
+	"os"
 	"time"
 
 	"github.com/BernardoDenkvitts/MongoAPP/internal/infra"
 	"github.com/BernardoDenkvitts/MongoAPP/internal/types"
 	"github.com/BernardoDenkvitts/MongoAPP/internal/utils"
+	"github.com/joho/godotenv"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
-
-const queueName = "MONGODB-APP-QUEUE"
 
 type IConsumer interface {
 	Consume()
@@ -34,7 +34,8 @@ func (rmq *RabbitMQConsumer) Consume() {
 
 	for newUsers := range msgs {
 
-		time.Sleep(1 * time.Minute)
+		//Necessary to avoid send data that came from other application !!
+		time.Sleep(30 * time.Second)
 
 		log.Println("(MONGO APP) Getting new users")
 
@@ -57,8 +58,12 @@ func (rmq *RabbitMQConsumer) Consume() {
 }
 
 func registerMongoDBConsumer(channel *amqp.Channel) <-chan amqp.Delivery {
+	path, _ := os.Getwd()
+	err := godotenv.Load(path + "/../.env")
+	utils.FailOnError(err, "Failed to load env file")
+
 	msgs, err := channel.Consume(
-		queueName,
+		os.Getenv("MongoDBQueueName"),
 		"",
 		false,
 		false,
@@ -66,9 +71,7 @@ func registerMongoDBConsumer(channel *amqp.Channel) <-chan amqp.Delivery {
 		false,
 		nil,
 	)
-	if err != nil {
-		utils.FailOnError(err, "(MONGO APP) Failed to register consumer")
-	}
+	utils.FailOnError(err, "(MONGO APP) Failed to register consumer")
 
 	return msgs
 }

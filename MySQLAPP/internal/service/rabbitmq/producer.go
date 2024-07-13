@@ -5,14 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/BernardoDenkvitts/MySQLApp/internal/infra"
 	"github.com/BernardoDenkvitts/MySQLApp/internal/utils"
+	"github.com/joho/godotenv"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
-
-const exchangeName = "MYSQL-APP"
 
 type IProducer interface {
 	Produce()
@@ -33,16 +33,19 @@ func NewRabbitMQProducer(userStorage infra.Storage, amqpChannel *amqp.Channel) *
 func (rmq *RabbitMQProducer) Produce() {
 
 	for {
-		time.Sleep(1 * time.Minute)
+		time.Sleep(30 * time.Second)
 
 		latestUsers, _ := rmq.userStorage.GetLatestUserInformations()
 
 		if len(latestUsers) == 0 {
-			log.Println("(MYSQL APP) No latest user informations available at " + time.Now().Format(time.RFC3339))
+			log.Println("(MYSQL APP) No latest user informations available at " + time.Now().UTC().String())
 			continue
 		}
 
-		fmt.Println(latestUsers)
+		log.Println("Users to be sent to exchange: ")
+		for _, user := range latestUsers {
+			fmt.Println(user)
+		}
 
 		latestUsersJSON, err := json.Marshal(latestUsers)
 		utils.FailOnError(err, "(MYSQL APP) Fail to marshal the data")
@@ -75,9 +78,13 @@ func (rmq *RabbitMQProducer) Produce() {
 }
 
 func (rmq *RabbitMQProducer) publishUsers(ctx context.Context, latestUsers []byte) (*amqp.DeferredConfirmation, error) {
+	path, _ := os.Getwd()
+	err := godotenv.Load(path + "/../.env")
+	utils.FailOnError(err, "Failed to load env file")
+
 	return rmq.amqpChannel.PublishWithDeferredConfirmWithContext(
 		ctx,
-		exchangeName,
+		os.Getenv("MySQLExchange"),
 		"fanout",
 		false,
 		false,
