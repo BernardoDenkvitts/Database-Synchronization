@@ -35,6 +35,9 @@ func NewRabbitMQ() (*RabbitMQ, error) {
 	bindQueue(channel, os.Getenv("MySQLExchange"))
 	log.Printf("Queue binded to %s Exchange", os.Getenv("MySQLExchange"))
 
+	bindQueue(channel, os.Getenv("PostgresSQLExchange"))
+	log.Printf("Queue binded to %s Exchange", os.Getenv("PostgresSQLExchange"))
+
 	return &RabbitMQ{
 		Connection: conn,
 		Channel:    channel,
