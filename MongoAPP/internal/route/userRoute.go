@@ -14,7 +14,6 @@ type UserRoutes interface {
 	handleCreateUser(w http.ResponseWriter, r *http.Request)
 	handleGetUserInformationsById(w http.ResponseWriter, r *http.Request)
 	handleGetUsersInformation(w http.ResponseWriter, r *http.Request)
-	teste(w http.ResponseWriter, r *http.Request)
 }
 
 type UserRoutesImpl struct {
@@ -32,17 +31,6 @@ func (route *UserRoutesImpl) Routes(router *http.ServeMux) {
 	router.HandleFunc("POST /create", route.handleCreateUser)
 	router.HandleFunc("GET /user/{id}", route.handleGetUserInformationsById)
 	router.HandleFunc("GET /user", route.handleGetUsersInformation)
-	router.HandleFunc("GET /user/teste", route.teste)
-}
-
-func (route *UserRoutesImpl) teste(w http.ResponseWriter, r *http.Request) {
-	usersResponseDTO, err := route.userService.Teste()
-	if err != nil {
-		utils.WriteJson(w, http.StatusInternalServerError, types.ApiResponse{Status: http.StatusInternalServerError, Response: err.Error()})
-		return
-	}
-
-	utils.WriteJson(w, http.StatusOK, types.ApiResponse{Status: http.StatusOK, Response: usersResponseDTO})
 }
 
 func (route *UserRoutesImpl) handleCreateUser(w http.ResponseWriter, r *http.Request) {
