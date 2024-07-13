@@ -55,6 +55,7 @@ func main() {
 
 		declareExchange(channel, os.Getenv("MySQLExchange"))
 		declareExchange(channel, os.Getenv("MongoDBExchange"))
+		declareExchange(channel, os.Getenv("PostgresSQLExchange"))
 
 		return
 	}
