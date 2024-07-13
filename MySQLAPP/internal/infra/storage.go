@@ -77,7 +77,6 @@ func (s *MySQLStore) Init() error {
 }
 
 func (s *MySQLStore) CreateUserInformation(user *types.User) error {
-
 	query := "INSERT INTO user (id, firstName, lastName, created_at) VALUES(?, ?, ?, ?)"
 	_, err := s.db.Query(query, user.Id, user.FirstName, user.LastName, user.CreatedAt)
 	if err != nil {
@@ -123,13 +122,12 @@ func (s *MySQLStore) GetUsersInformations() ([]*types.User, error) {
 }
 
 func (s *MySQLStore) GetLatestUserInformations() ([]*types.User, error) {
-	rows, err := s.db.Query("SELECT * FROM user WHERE created_at >= UTC_TIMESTAMP() - INTERVAL 1 MINUTE")
+	rows, err := s.db.Query("SELECT * FROM user WHERE created_at >= UTC_TIMESTAMP() - INTERVAL 30 SECOND")
 	if err != nil {
 		return nil, err
 	}
 
-	var users []*types.User
-
+	users := []*types.User{}
 	for rows.Next() {
 		user, err := scanIntoUser(rows)
 		if err != nil {

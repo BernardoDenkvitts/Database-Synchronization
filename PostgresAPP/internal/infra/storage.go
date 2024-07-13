@@ -80,7 +80,7 @@ func (s *PostgresStore) GetUserById(id string) (*types.User, error) {
 }
 
 func (s *PostgresStore) GetLatestUserInformations() ([]*types.User, error) {
-	query := "SELECT * FROM userinfo WHERE userinfo.created_at >= current_timestamp - INTERVAL '1 minute'"
+	query := "SELECT * FROM userinfo WHERE userinfo.created_at >= NOW() at time zone 'utc' - INTERVAL '30 second'"
 	rows, err := s.db.Query(query)
 	if err != nil {
 		return nil, err

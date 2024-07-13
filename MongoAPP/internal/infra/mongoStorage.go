@@ -81,10 +81,8 @@ func (s *MongoDBStore) GetUsersInformations() ([]*types.User, error) {
 func (s *MongoDBStore) GetLatestUserInformations() ([]*types.User, error) {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	fiveMinutesAgo := time.Now().Add(-1 * time.Minute)
-
 	filter := bson.M{
-		"created_at": bson.M{"$gt": fiveMinutesAgo},
+		"created_at": bson.M{"$gte": time.Now().UTC().Add(-30 * time.Second)},
 	}
 
 	cursor, err := s.getUserCollection().Find(ctx, filter)
@@ -101,7 +99,7 @@ func (s *MongoDBStore) GetLatestUserInformations() ([]*types.User, error) {
 }
 
 func decodeUsersFromCursor(ctx context.Context, cursor *mongo.Cursor) ([]*types.User, error) {
-	var users []*types.User
+	users := []*types.User{}
 	for cursor.Next(ctx) {
 		user := new(types.User)
 		err := cursor.Decode(&user)
