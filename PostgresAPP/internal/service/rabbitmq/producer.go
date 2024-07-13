@@ -31,12 +31,9 @@ func NewRabbitMQProducer(userStorage infra.Storage, amqpChannel *amqp.Channel) *
 }
 
 func (rmq *RabbitMQProducer) Produce() {
-	path, _ := os.Getwd()
-	err := godotenv.Load(path + "/../.env")
-	utils.FailOnError(err, "Failed to load env file")
 
 	for {
-		time.Sleep(1 * time.Minute)
+		time.Sleep(30 * time.Second)
 
 		latestUsers, _ := rmq.userStorage.GetLatestUserInformations()
 
@@ -45,7 +42,10 @@ func (rmq *RabbitMQProducer) Produce() {
 			continue
 		}
 
-		fmt.Println(latestUsers)
+		log.Println("Users to be sent to exchange: ")
+		for _, user := range latestUsers {
+			fmt.Println(user)
+		}
 
 		latestUsersJSON, err := json.Marshal(latestUsers)
 		utils.FailOnError(err, "(POSTGRESSQL APP) Fail to marshal the data")
@@ -79,6 +79,10 @@ func (rmq *RabbitMQProducer) Produce() {
 }
 
 func (rmq *RabbitMQProducer) publishUsers(ctx context.Context, latestUsers []byte) (*amqp.DeferredConfirmation, error) {
+	path, _ := os.Getwd()
+	err := godotenv.Load(path + "/../.env")
+	utils.FailOnError(err, "Failed to load env file")
+
 	return rmq.amqpChannel.PublishWithDeferredConfirmWithContext(
 		ctx,
 		os.Getenv("PostgresSQLExchange"),
