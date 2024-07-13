@@ -10,15 +10,6 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-const (
-	user         = "guest"
-	RBMQpassword = "guest"
-	host         = "localhost"
-	port         = "5672"
-	exchangeName = "MYSQL-APP"
-	queueName    = "MYSQL-APP-QUEUE"
-)
-
 type RabbitMQ struct {
 	Connection *amqp.Connection
 	Channel    *amqp.Channel
@@ -43,6 +34,9 @@ func NewRabbitMQ() (*RabbitMQ, error) {
 
 	bindQueue(channel, os.Getenv("MongoDBExchange"))
 	log.Printf("Queue binded to %s Exchange", os.Getenv("MongoDBExchange"))
+
+	bindQueue(channel, os.Getenv("PostgresSQLExchange"))
+	log.Printf("Queue binded to %s Exchange", os.Getenv("PostgresSQLExchange"))
 
 	return &RabbitMQ{
 		Connection: conn,
