@@ -9,7 +9,6 @@ import (
 
 	"github.com/BernardoDenkvitts/MongoAPP/internal/infra"
 	"github.com/BernardoDenkvitts/MongoAPP/internal/utils"
-	"github.com/joho/godotenv"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -78,10 +77,6 @@ func (rmq *RabbitMQProducer) Produce() {
 }
 
 func (rmq *RabbitMQProducer) publishUsers(ctx context.Context, latestUsers []byte) (*amqp.DeferredConfirmation, error) {
-	path, _ := os.Getwd()
-	err := godotenv.Load(path + "/../.env")
-	utils.FailOnError(err, "Failed to load env file")
-
 	return rmq.amqpChannel.PublishWithDeferredConfirmWithContext(
 		ctx,
 		os.Getenv("MongoDBExchange"),

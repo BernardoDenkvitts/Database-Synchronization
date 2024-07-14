@@ -9,7 +9,6 @@ import (
 	"github.com/BernardoDenkvitts/MongoAPP/internal/infra"
 	"github.com/BernardoDenkvitts/MongoAPP/internal/types"
 	"github.com/BernardoDenkvitts/MongoAPP/internal/utils"
-	"github.com/joho/godotenv"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -58,10 +57,6 @@ func (rmq *RabbitMQConsumer) Consume() {
 }
 
 func registerMongoDBConsumer(channel *amqp.Channel) <-chan amqp.Delivery {
-	path, _ := os.Getwd()
-	err := godotenv.Load(path + "/../.env")
-	utils.FailOnError(err, "Failed to load env file")
-
 	msgs, err := channel.Consume(
 		os.Getenv("MongoDBQueueName"),
 		"",

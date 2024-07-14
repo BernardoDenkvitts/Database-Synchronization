@@ -8,17 +8,14 @@ services:
       ports:
         - 5672:5672
         - 15672:15672
-      #volumes:
-      #  - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-      #  - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
-    
+
     init_rabbitmq: 
       build:
         context: ./
-        dockerfile: scripts/Dockerfile 
+        dockerfile: scripts/Dockerfile
       depends_on:
         - rabbitmq
-    
+        
     mongo:
       image: mongo:7.0
       restart: always
@@ -28,8 +25,6 @@ services:
         MONGO_INITDB_ROOT_USERNAME: root
         MONGO_INITDB_ROOT_PASSWORD: root
         MONGO_INITDB_DATABASE: mongodbuser
-      #volumes:
-      #  - "mongodb-data:/var/lib/mongodb" 
 
     mongo-express:
       image: mongo-express
@@ -50,8 +45,6 @@ services:
       environment:
         MYSQL_ROOT_PASSWORD: root 
         MYSQL_DATABASE: mysqluser    
-      #volumes:
-      #  - "mysql-data:/var/lib/mysql"  
 
     postgres: 
       image: postgres:16.3-alpine3.20
@@ -61,10 +54,3 @@ services:
         - 5432:5432
       environment:
         POSTGRES_PASSWORD: root
-      #volumes:
-      # - postgres-data:/var/lib/postgres
-
-#volumes:
-#  mongodb-data:
-#  mysql-data:
-#  postgres-data:

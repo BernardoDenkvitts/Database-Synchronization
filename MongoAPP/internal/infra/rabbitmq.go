@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/BernardoDenkvitts/MongoAPP/internal/utils"
-	"github.com/joho/godotenv"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -16,10 +15,6 @@ type RabbitMQ struct {
 }
 
 func NewRabbitMQ() (*RabbitMQ, error) {
-	path, _ := os.Getwd()
-	err := godotenv.Load(path + "/../.env")
-	utils.FailOnError(err, "Failed to load env file")
-
 	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s", os.Getenv("user"), os.Getenv("RBMQpassword"), os.Getenv("host"), os.Getenv("port")))
 	utils.FailOnError(err, "Error to connect to rabbitmq")
 

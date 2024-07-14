@@ -9,7 +9,6 @@ import (
 	"github.com/BernardoDenkvitts/MySQLApp/internal/infra"
 	"github.com/BernardoDenkvitts/MySQLApp/internal/types"
 	"github.com/BernardoDenkvitts/MySQLApp/internal/utils"
-	"github.com/joho/godotenv"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -57,10 +56,6 @@ func (rmq *RabbitMQConsumer) Consume() {
 }
 
 func registerMySQLConsumer(channel *amqp.Channel) <-chan amqp.Delivery {
-	path, _ := os.Getwd()
-	err := godotenv.Load(path + "/../.env")
-	utils.FailOnError(err, "Failed to load env file")
-
 	msgs, err := channel.Consume(
 		os.Getenv("MySQLQueueName"),
 		"",

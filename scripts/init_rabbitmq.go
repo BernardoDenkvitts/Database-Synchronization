@@ -39,9 +39,7 @@ func main() {
 			panic("Failed to load env file ->" + err.Error())
 		}
 
-		host := "rabbitmq"
-
-		conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s", os.Getenv("user"), os.Getenv("RBMQpassword"), host, os.Getenv("port")))
+		conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s", os.Getenv("user"), os.Getenv("RBMQpassword"), "rabbitmq", os.Getenv("port")))
 		if err != nil {
 			fmt.Println("Error to connect to rabbitmq ->" + err.Error())
 			trys += 1
