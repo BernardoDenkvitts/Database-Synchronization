@@ -41,9 +41,9 @@ This shouldn't happen, but if it does, the received user won't be created again 
 
 ## The following image shows how the data is being shared between applications
 
-![Synchronization.png](/Synchronization.png)
+![Synchronization.png](Synchronization.png)
 
-As you can see, each application queue receives data from the other applications exchanges, making possible the synchronization.
+As you can see, each application queue receives data from the other applications exchanges, enabling synchronization.
 
 ## :white_check_mark: Requirements
 
