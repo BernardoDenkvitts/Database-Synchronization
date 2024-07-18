@@ -90,14 +90,14 @@ $ go run .\cmd\main.go
 ### /{database} options
 
     * mysql
-    * mongo
+    * mongodb
     * postgres
 
 ### Erros
 
 This API uses the following error codes:
 
-- 400 Bad Request: The request was malformed
+- 400 Bad Request: The request was malformed.
 - 404 Not Found: The requested resource was not found.
 - 500 Internal Server Error: An unexpected error occurred on the server.
 
