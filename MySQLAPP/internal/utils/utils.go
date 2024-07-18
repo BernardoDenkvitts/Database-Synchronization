@@ -11,7 +11,9 @@ func ParseJson(r *http.Request, payload any) error {
 	if r.Body == nil {
 		return fmt.Errorf("missing request body")
 	}
-	return json.NewDecoder(r.Body).Decode(payload)
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+	return decoder.Decode(payload)
 }
 
 func WriteJson(w http.ResponseWriter, status int, response any) error {
