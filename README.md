@@ -6,15 +6,16 @@
   <a href="#how-the-problem-was-solved">Solution</a> &#xa0; | &#xa0;
   <a href="#white_check_mark-requirements">Requirements</a> &#xa0; | &#xa0;
   <a href="#checkered_flag-starting">Starting</a> &#xa0; | &#xa0;
-  <a href="#api-documentation">API Doc</a> &#xa0; | &#xa0;
-  <a href="https://github.com/BernardoDenkvitts" target="_blank">Author</a>
+  <a href="#api-documentation">API Doc</a> &#xa0;
 </p>
 
 <br>
 
 ## :dart: About
 
-This project aims to synchronize the databases of three independent Golang Web APIs. Each API manages its own data and creates users independently through its endpoints. However, to ensure data consistency, each 30 seconds a synchronization process happens to replicate the latest users created across all databases.
+The objective of this project is to synchronise the databases of three independent Golang Web APIs. Each API manages its own data and creates users independently through its endpoints. However, to ensure data consistency, a background synchronization process is initiated every 30 seconds to replicate the latest users created across all databases.
+
+Rather than sending each new user straight to the appropriate exchange, i attempted to emulate a batch process where the applications wait for a specified period (30 seconds) and then send an array of new users to be processed by other applications.
 
 ## :rocket: Technologies
 
@@ -75,11 +76,110 @@ $ go run .\cmd\main.go
 $ cd MySQLAPP
 $ go run .\cmd\main.go
 
-# Mongo APP will initialize in http://localhost:8181
 # MySQLAPP will initialize in http://localhost:8080
+# Mongo APP will initialize in http://localhost:8181
 # PostgresAPP will initialize in http://localhost:8282
 ```
 
 ## API Documentation
+
+### Base URL
+
+`http://localhost:{port}/{database}/user/`
+
+### /{database} options
+
+    * mysql
+    * mongo
+    * postgres
+
+### Erros
+
+This API uses the following error codes:
+
+- 400 Bad Request: The request was malformed
+- 404 Not Found: The requested resource was not found.
+- 500 Internal Server Error: An unexpected error occurred on the server.
+
+## Error response
+
+    {
+      "status": int,
+      "response": string
+    }
+
+## Create user
+
+`POST /create`
+
+### Request
+
+    {
+        "firstName": string,
+        "lastName": string
+    }
+
+### Response
+
+    HTTP/1.1 201 CREATED
+    Date: Wed, 17 Jul 2024 03:08:28 GMT
+    Content-Type: application/json
+    Status: 201 CREATED
+    Uri: /{database}/user/{userId}
+    Content-Length: 36
+
+    {
+      "status": 201,
+      "response": "Created"
+    }
+
+## Get user
+
+`GET /create/{userId}`
+
+### Response
+
+    HTTP/1.1 200 OK
+    Date: Wed, 17 Jul 2024 03:08:28 GMT
+    Content-Type: application/json
+    Status: 200 OK
+    Content-Length: 36
+
+    {
+      "status": 200,
+      "response": [
+        {
+          "id": string,
+          "firstName": string,
+          "lastName": string,
+          "createdAt": timestamp
+        }
+      ]
+
+}
+
+## Get users
+
+`Base URL`
+
+### Response
+
+    HTTP/1.1 200 OK
+    Date: Wed, 17 Jul 2024 03:08:28 GMT
+    Content-Type: application/json
+    Status: 200 OK
+    Content-Length: 155
+
+    {
+      "status": 200,
+      "response": [
+          {
+              "id": string,
+              "firstName": string,
+              "lastName": string,
+              "createdAt": timestamp
+          }
+      ]
+    }
 
 <a href="#top">Back to top</a>
