@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/BernardoDenkvitts/PostgresAPP/internal/infra"
-	"github.com/BernardoDenkvitts/PostgresAPP/internal/route"
-	"github.com/BernardoDenkvitts/PostgresAPP/internal/service"
-	"github.com/BernardoDenkvitts/PostgresAPP/internal/service/rabbitmq"
-	"github.com/BernardoDenkvitts/PostgresAPP/internal/utils"
+	"github.com/BernardoDenkvitts/PostgresqlAPP/internal/infra"
+	"github.com/BernardoDenkvitts/PostgresqlAPP/internal/route"
+	"github.com/BernardoDenkvitts/PostgresqlAPP/internal/service"
+	"github.com/BernardoDenkvitts/PostgresqlAPP/internal/service/rabbitmq"
+	"github.com/BernardoDenkvitts/PostgresqlAPP/internal/utils"
 )
 
 type ApiServer struct {
@@ -27,7 +27,7 @@ func (api *ApiServer) Run() error {
 	storage := setupDatabase()
 
 	rabbitMq, err := infra.NewRabbitMQ()
-	utils.FailOnError(err, "(POSTGRESS APP) Error to instanciate RabbitMQ")
+	utils.FailOnError(err, "(POSTGRESQL APP) Error to instanciate RabbitMQ")
 	defer rabbitMq.Close()
 
 	rabbitMqProducer := rabbitmq.NewRabbitMQProducer(storage, rabbitMq.Channel)
@@ -42,7 +42,7 @@ func (api *ApiServer) Run() error {
 	userRoute := route.NewUserRoutesImpl(userService)
 	userRoute.Routes(router)
 
-	fmt.Println("Postgres APP Server listening at port " + api.Address)
+	fmt.Println("Postgresql APP Server listening at port " + api.Address)
 	return http.ListenAndServe(api.Address, router)
 }
 

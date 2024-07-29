@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/BernardoDenkvitts/PostgresAPP/internal/infra"
-	"github.com/BernardoDenkvitts/PostgresAPP/internal/types"
+	"github.com/BernardoDenkvitts/PostgresqlAPP/internal/infra"
+	"github.com/BernardoDenkvitts/PostgresqlAPP/internal/types"
 )
 
 type UserService interface {

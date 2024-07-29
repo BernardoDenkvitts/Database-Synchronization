@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/BernardoDenkvitts/PostgresAPP/cmd/api"
+	"github.com/BernardoDenkvitts/PostgresqlAPP/cmd/api"
 	"github.com/joho/godotenv"
 )
 

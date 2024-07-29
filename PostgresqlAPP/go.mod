@@ -1,4 +1,4 @@
-module github.com/BernardoDenkvitts/PostgresAPP
+module github.com/BernardoDenkvitts/PostgresqlAPP
 
 go 1.22.1
 

@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/BernardoDenkvitts/PostgresAPP/internal/utils"
+	"github.com/BernardoDenkvitts/PostgresqlAPP/internal/utils"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 

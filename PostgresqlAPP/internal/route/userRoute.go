@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/BernardoDenkvitts/PostgresAPP/internal/service"
-	"github.com/BernardoDenkvitts/PostgresAPP/internal/types"
-	"github.com/BernardoDenkvitts/PostgresAPP/internal/utils"
+	"github.com/BernardoDenkvitts/PostgresqlAPP/internal/service"
+	"github.com/BernardoDenkvitts/PostgresqlAPP/internal/types"
+	"github.com/BernardoDenkvitts/PostgresqlAPP/internal/utils"
 )
 
 type UserRoutes interface {

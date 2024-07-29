@@ -6,9 +6,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/BernardoDenkvitts/PostgresAPP/internal/infra"
-	"github.com/BernardoDenkvitts/PostgresAPP/internal/types"
-	"github.com/BernardoDenkvitts/PostgresAPP/internal/utils"
+	"github.com/BernardoDenkvitts/PostgresqlAPP/internal/infra"
+	"github.com/BernardoDenkvitts/PostgresqlAPP/internal/types"
+	"github.com/BernardoDenkvitts/PostgresqlAPP/internal/utils"
 	"github.com/joho/godotenv"
 	amqp "github.com/rabbitmq/amqp091-go"
 )

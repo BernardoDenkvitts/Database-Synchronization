@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"log"
 
-	"github.com/BernardoDenkvitts/PostgresAPP/internal/types"
-	"github.com/BernardoDenkvitts/PostgresAPP/internal/utils"
+	"github.com/BernardoDenkvitts/PostgresqlAPP/internal/types"
+	"github.com/BernardoDenkvitts/PostgresqlAPP/internal/utils"
 	_ "github.com/lib/pq"
 )
 

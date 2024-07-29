@@ -25,7 +25,7 @@ The following tools were used in this project:
 - [RabbitMQ](https://www.rabbitmq.com/)
 - [Docker](https://www.docker.com/)
 - [MySQL](https://www.mysql.com/)
-- [PostgresSQL](https://www.postgresql.org/)
+- [PostgreSQL](https://www.postgresql.org/)
 - [MongoDB](https://www.mongodb.com/)
 
 ## How the problem was solved
@@ -72,13 +72,13 @@ $ go run .\cmd\main.go
 $ cd MySQLAPP
 $ go run .\cmd\main.go
 
-# PostgresAPP APP
-$ cd MySQLAPP
+# PostgresqlAPP APP
+$ cd PostgresqlAPP
 $ go run .\cmd\main.go
 
 # MySQLAPP will initialize in http://localhost:8080
 # Mongo APP will initialize in http://localhost:8181
-# PostgresAPP will initialize in http://localhost:8282
+# PostgresqlAPP will initialize in http://localhost:8282
 ```
 
 ## API Documentation
