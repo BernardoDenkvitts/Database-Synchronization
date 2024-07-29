@@ -13,7 +13,7 @@
 
 ## :dart: About
 
-The objective of this project is to synchronise the databases of three independent Golang Web APIs. Each API manages its own data and creates users independently through its endpoints. However, to ensure data consistency, a background synchronization process is initiated every 30 seconds to replicate the latest users created across all databases.
+The objective of this project is to synchronize the databases of three independent Golang Web APIs. Each API manages its own data and creates users independently through its endpoints. However, to ensure data consistency, a background synchronization process is initiated every 30 seconds to replicate the latest users created across all databases.
 
 Rather than sending each new user straight to the appropriate exchange, i attempted to emulate a batch process where the applications wait for a specified period (30 seconds) and then send an array of new users to be processed by other applications.
 
